@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>KodeKloud Streak</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="card">
+      <header class="card-header">
+        <div class="title">KodeKloud Streak</div>
+        <div class="sub">Daily learning streak & heatmap</div>
+      </header>
+
+      <section class="stats">
+        <div class="stat">
+          <div class="label">Current streak</div>
+          <div id="curStreak" class="value">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total days</div>
+          <div id="totalDays" class="value">—</div>
+        </div>
+      </section>
+
+      <section class="heat-section">
+        <div class="heat-header">
+          <div class="heat-title">Activity — last 365 days</div>
+          <div class="legend">
+            <span class="legend-label">1</span>
+            <div class="legend-sq l1" title="1 video"></div>
+            <span class="legend-label">2</span>
+            <div class="legend-sq l2" title="2 videos"></div>
+            <span class="legend-label">3</span>
+            <div class="legend-sq l3" title="3 videos"></div>
+            <span class="legend-label">4+</span>
+            <div class="legend-sq l4" title="4+ videos"></div>
+          </div>
+        </div>
+        <div id="heatmap" class="heatmap" title="Loading heatmap..."></div>
+      </section>
+
+      <footer class="card-footer">
+        <button id="clearBtn" class="btn muted">Clear data</button>
+        <div class="note">
+          A day is counted only after you actually watch (ended or watched
+          &gt;=60s / 50%).
+        </div>
+      </footer>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,220 @@
+/* popup.css (replace the previous file contents or merge; here is the full file for convenience) */
+:root {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --muted: #9aa6b2;
+  --accent: #2b7cff;
+  --accent-2: #3ad0ff;
+  --tile-0: #0f1724; /* empty */
+  --tile-1: #1f3b64;
+  --tile-2: #2164a6;
+  --tile-3: #2b86d1;
+  --tile-4: #4fb3ff;
+  --glass: rgba(255, 255, 255, 0.04);
+  font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system,
+    "Helvetica Neue", Arial;
+  color: #e6eef8;
+  font-size: 12px;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 10px;
+  background: var(--bg);
+  max-width: 360px; /* keep popup narrow for Chrome */
+  color: var(--text);
+}
+.card {
+  max-width: 340px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.card-header .title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #eaf4ff;
+}
+.card-header .sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.stat {
+  flex: 1;
+  background: var(--glass);
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+}
+.stat .label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.stat .value {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #fff;
+}
+
+.heat-section {
+  margin-top: 12px;
+}
+.heat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.heat-title {
+  font-size: 12px;
+  color: var(--muted);
+  margin-right: 8px;
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.legend-sq {
+  width: 14px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.legend-sq.l0 {
+  background: var(--tile-0);
+}
+.legend-sq.l1 {
+  background: var(--tile-1);
+}
+.legend-sq.l2 {
+  background: var(--tile-2);
+}
+.legend-sq.l3 {
+  background: var(--tile-3);
+}
+.legend-sq.l4 {
+  background: var(--tile-4);
+}
+
+/* HEATMAP container: uses flex so weeks line up horizontally; hidden scrollbar until hover */
+.heatmap {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  max-width: 100%;
+  /* make it visually compact */
+  height: 7 * 10px + 6 * 2px; /* approximate to reserve vertical space */
+}
+
+/* Hide scrollbar by default (WebKit/Blink) */
+.heatmap::-webkit-scrollbar {
+  height: 0;
+}
+.heatmap:hover::-webkit-scrollbar {
+  height: 10px;
+} /* show on hover */
+.heatmap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0);
+}
+
+/* Firefox: hide by default but reveal on hover using scrollbar-width */
+.heatmap {
+  scrollbar-width: none;
+}
+.heatmap:hover {
+  scrollbar-width: thin;
+}
+
+/* each week column */
+.week {
+  display: grid;
+  grid-template-rows: repeat(7, 10px);
+  gap: 4px;
+}
+
+/* cell styling (smaller so last 30 days more likely visible) */
+.cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--tile-0);
+  cursor: default;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+}
+.cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(11, 20, 30, 0.5);
+}
+
+/* color intensity classes */
+.c0 {
+  background: var(--tile-0);
+}
+.c1 {
+  background: var(--tile-1);
+}
+.c2 {
+  background: var(--tile-2);
+}
+.c3 {
+  background: var(--tile-3);
+}
+.c4 {
+  background: var(--tile-4);
+}
+
+/* footer */
+.card-footer {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+.btn {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn.muted {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+}
+.note {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
