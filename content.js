@@ -13,13 +13,57 @@
     window.frameElement ? "iframe" : "top"
   );
 
+  // Get today's date key in local timezone
+  function todayKey() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Check if we've already recorded today
+  async function hasRecordedToday() {
+    return new Promise((resolve) => {
+      const key = `recorded_${todayKey()}`;
+      try {
+        chrome.storage.local.get([key], (res) => {
+          resolve(!!res[key]);
+        });
+      } catch (e) {
+        log("storage check error:", e);
+        resolve(false);
+      }
+    });
+  }
+
+  // Mark that we've recorded today
+  async function markRecordedToday() {
+    const key = `recorded_${todayKey()}`;
+    try {
+      await chrome.storage.local.set({ [key]: true });
+    } catch (e) {
+      log("storage set error:", e);
+    }
+  }
+
   // guard: chrome.runtime may not be available in some frames; wrap calls
-  function sendRecord(extra = {}) {
+  async function sendRecord(extra = {}) {
+    // Check if already recorded today
+    const alreadyRecorded = await hasRecordedToday();
+    if (alreadyRecorded) {
+      log("Already recorded today - skipping");
+      return;
+    }
+
     try {
       chrome.runtime.sendMessage(
         { action: "recordToday", ts: Date.now(), ...extra },
         (r) => {
           log("bg ack", r);
+          if (r && r.ok) {
+            markRecordedToday();
+          }
         }
       );
     } catch (e) {
@@ -36,13 +80,21 @@
     const MIN_FRAC = 0.5; // or minimum fraction of duration watched
     let sessionWatched = 0; // cumulative seconds watched in this "session"
     let lastTime = null;
-    let recordedToday = false; // local debounce in this frame; background also increments counts
+    let recordedThisVideo = false; // local debounce per video element
 
-    function tryRecord(reason) {
-      if (recordedToday) return;
-      recordedToday = true;
+    async function tryRecord(reason) {
+      if (recordedThisVideo) return;
+
+      // Check global flag before recording
+      const alreadyRecorded = await hasRecordedToday();
+      if (alreadyRecorded) {
+        log("Already recorded today globally - skipping");
+        return;
+      }
+
+      recordedThisVideo = true;
       log("Recording today because:", reason);
-      sendRecord({ reason });
+      await sendRecord({ reason });
     }
 
     // called frequently by 'timeupdate' - measure delta time
@@ -158,7 +210,7 @@
   // Listen for Vimeo postMessage play events as a fallback (player API)
   window.addEventListener(
     "message",
-    (ev) => {
+    async (ev) => {
       try {
         const d = ev.data || {};
         if (typeof d === "object" && d.event === "play") {
@@ -171,7 +223,7 @@
         if (typeof d === "object" && d.event === "ended") {
           // if a vimeo 'ended' message arrives in this frame, record
           log("vimeo postMessage ended -> record");
-          sendRecord({ reason: "vimeo-ended" });
+          await sendRecord({ reason: "vimeo-ended" });
         }
       } catch (e) {}
     },

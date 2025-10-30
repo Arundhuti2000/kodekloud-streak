@@ -1,8 +1,11 @@
-// popup.js (replace entire file)
+// popup.js
 function todayKey(offset = 0) {
   const d = new Date();
   d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 function getMap() {
@@ -30,6 +33,10 @@ function totalDays(map) {
   return Object.keys(map).filter((k) => map[k] > 0).length;
 }
 
+function totalVideos(map) {
+  return Object.values(map).reduce((sum, count) => sum + count, 0);
+}
+
 function colorBucket(count, maxCount) {
   // Absolute mapping of views → color bucket
   if (!count || count <= 0) return 0; // no activity
@@ -43,8 +50,11 @@ async function render() {
   const map = await getMap();
   const cur = calcCurrentStreak(map);
   const total = totalDays(map);
+  const videos = totalVideos(map);
+
   document.getElementById("curStreak").textContent = cur;
   document.getElementById("totalDays").textContent = total;
+  document.getElementById("totalVideos").textContent = videos;
 
   // find max count in the map for intensity scaling
   const counts = Object.values(map).map((v) => Number(v || 0));
